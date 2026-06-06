@@ -1,10 +1,10 @@
-# WeatherWear AI - Twój Mobilny Doradca Pogodowy
+# WSB Weather AI Assistant - Twój Doradca Pogodowy
 
-**WeatherWear AI** to nowoczesna, responsywna aplikacja webowa (zaprojektowana w duchu Mobile-First), która działa jak osobisty asystent stylistyczny. Na podstawie realnych, bieżących danych pogodowych aplikacja podpowiada użytkownikowi, jak powinien się ubrać przed wyjściem z domu.
+**WSB Weather AI Assistant - Twój Doradca Pogodowy** to nowoczesna, responsywna aplikacja webowa (zaprojektowana w duchu Mobile-First), która działa jak osobisty asystent stylistyczny. Na podstawie realnych, bieżących danych pogodowych aplikacja podpowiada użytkownikowi, jak powinien się ubrać przed wyjściem z domu.
 
 ---
 
-## 🚀 Główne Funkcje Aplikacji
+## Główne Funkcje Aplikacji
 
 * **Pobieranie Pogody w Czasie Rzeczywistym:** Integracja z zewnętrznym API **OpenWeatherMap** pozwala na sprawdzenie aktualnych warunków (temperatura, temperatura odczuwalna, opady, wiatr) dla dowolnego miasta na świecie.
 * **Inteligentny Algorytm Rekomendacji:** System analizuje temperaturę oraz warunki atmosferyczne (deszcz, śnieg, silny wiatr) i generuje spersonalizowaną, szczegółową poradę dotyczącą ubioru.
@@ -15,7 +15,7 @@
 
 ---
 
-## 📁 Struktura Projektu
+## Struktura Projektu
 
 Projekt został napisany w czystym kodzie (Vanilla JavaScript, HTML5, CSS3) z zachowaniem architektury modułowej (ES Modules):
 
