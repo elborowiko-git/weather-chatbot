@@ -1,12 +1,12 @@
 /* ==========================================================================
-   1. ZMIENNE I CONFIG BAZOWY
+   1. ZMIENNE I KONFIGURACJA BAZOWA
    ========================================================================== */
 :root {
-    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-    --color-primary-dark: #1e293b; /* Ciemnoniebieskie litery / tło bota */
-    --color-primary-blue: #2563eb; /* Akcenty i guziki */
-    --color-bot-bg: #1e293b;       /* Tło bota */
-    --color-user-bg: #ffffff;      /* Tło użytkownika */
+    --bg-gradient: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 100%); 
+    --color-primary-dark: #1e293b; 
+    --color-primary-blue: #0284c7; 
+    --color-bot-bg: #1e293b;       
+    --color-user-bg: #ffffff;      
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -28,7 +28,7 @@ body {
 }
 
 /* ==========================================================================
-   2. ANIMACJA PŁYNĄCYCH CHMUR W TLE
+   2. ANIMACJA CHMUR W TLE (EFEKT PARALAKSY)
    ========================================================================== */
 .clouds-background {
     position: absolute;
@@ -39,15 +39,14 @@ body {
     overflow: hidden;
     z-index: 1;
     pointer-events: none;
-    opacity: 0.25; /* Subtelne, niekontrastujące tło */
+    opacity: 0.65;
 }
 
 .cloud {
     position: absolute;
     background: #ffffff;
     border-radius: 100px;
-    width: 200px;
-    height: 60px;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
 }
 .cloud::before, .cloud::after {
     content: '';
@@ -55,206 +54,265 @@ body {
     background: #ffffff;
     border-radius: 50%;
 }
-.cloud::before {
-    width: 100px;
-    height: 100px;
-    top: -50px;
-    left: 30px;
-}
-.cloud::after {
-    width: 120px;
-    height: 120px;
-    top: -70px;
-    right: 30px;
-}
+.cloud::before { width: 50%; height: 160%; top: -80%; left: 15%; }
+.cloud::after { width: 60%; height: 200%; top: -110%; right: 15%; }
 
-.layer-1 {
-    top: 15%;
-    left: -250px;
-    transform: scale(0.8);
-    animation: floatClouds 35s linear infinite;
-}
+/* Skalowanie rozmiarów chmur */
+.size-sm { width: 120px; height: 35px; }
+.size-md { width: 220px; height: 65px; }
+.size-lg { width: 340px; height: 100px; }
 
-.layer-2 {
-    top: 45%;
-    left: -250px;
-    transform: scale(1.2);
-    animation: floatClouds 50s linear infinite;
-    animation-delay: 10s;
-}
+/* Konfiguracja warstw, prędkości i przezroczystości */
+.layer-1 { top: 10%; left: -350px; opacity: 0.4; animation: floatClouds 40s linear infinite; }
+.layer-2 { top: 35%; left: -350px; opacity: 0.7; animation: floatClouds 65s linear infinite; }
+.layer-3 { top: 60%; left: -350px; opacity: 0.5; animation: floatClouds 90s linear infinite; }
+.delay-1 { animation-delay: 15s; top: 20%; }
+.delay-2 { animation-delay: 30s; top: 50%; }
 
 @keyframes floatClouds {
-    0% { left: -250px; }
-    100% { left: 105%; }
+    0% { transform: translateX(0); left: -350px; }
+    100% { transform: translateX(100vw); left: 350px; }
 }
 
 /* ==========================================================================
-   3. KONTENER JAKO APLIKACJA NA TELEFON (DESKTOP)
+   3. GŁÓWNY KONTENER (PROPORCJE SMARTFONA / DESKTOP SPLIT)
    ========================================================================== */
 .app-container {
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 420px; /* Szerokość typowego smartfona */
+    max-width: 740px; 
     height: 85vh;
     max-height: 850px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.45); 
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 30px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.15);
     display: flex;
-    flex-direction: column;
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
 /* ==========================================================================
-   4. NAGŁÓWEK I INTERFEJS
+   4. PASEK BOCZNY (SIDEBAR) I PROJEKT GUZIKÓW SYSTEMOWYCH
    ========================================================================== */
-.app-header {
-    background: rgba(15, 23, 42, 0.6);
-    padding: 16px 20px;
+.app-sidebar {
+    width: 260px;
+    background: rgba(15, 23, 42, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    z-index: 20;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
-.bot-profile {
+.sidebar-header {
+    flex-shrink: 0;
+}
+
+/* Nowoczesne przyciski systemowe w panelu bocznym */
+.sidebar-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 12px;
+    transition: all 0.3s ease;
+    outline: none;
 }
 
+/* Nowa rozmowa (Niebieski akcent) */
+.btn-new-chat {
+    background-color: var(--color-primary-blue);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+.btn-new-chat:hover {
+    background-color: #0369a1;
+    transform: translateY(-1px);
+}
+
+/* Sekcja historii wyszukiwań */
+.sidebar-history {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+.sidebar-history h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Przyciski kafelkowe miast */
+.btn-history-item {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--color-primary-dark);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+.btn-history-item:hover {
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* Wyczyść pamięć (Ostrzegawcza czerwień) */
+.btn-clear-memory {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    margin-top: auto;
+}
+.btn-clear-memory:hover {
+    background: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* ==========================================================================
+   5. INTERFEJS CZATU (GŁÓWNE OKNO)
+   ========================================================================== */
+.chat-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+}
+
+.app-header {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.icon-toggle-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: var(--color-primary-dark);
+    cursor: pointer;
+    padding: 4px;
+    display: none; /* Domyślnie schowany na PC */
+}
+
+.bot-profile { display: flex; align-items: center; gap: 12px; }
 .avatar {
     position: relative;
-    width: 44px;
-    height: 44px;
-    background: var(--color-primary-blue);
+    width: 40px;
+    height: 40px;
+    background: var(--color-primary-dark);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
-    font-size: 20px;
+    font-size: 18px;
 }
-
 .status-dot {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
+    bottom: 1px;
+    right: 1px;
+    width: 9px;
+    height: 9px;
     background: #10b981;
-    border: 2px solid #0f172a;
+    border: 2px solid #fff;
     border-radius: 50%;
 }
+.bot-profile h1 { color: var(--color-primary-dark); font-size: 15px; font-weight: 600; }
+.bot-profile p { color: #64748b; font-size: 11px; }
 
-.bot-profile h1 {
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.bot-profile p {
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-.clear-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.clear-btn:hover {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-/* ==========================================================================
-   5. OKNO CZATU I DYMKI WIADOMOŚCI
-   ========================================================================== */
+/* PANEL WIADOMOŚCI */
 .chat-area {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     scroll-behavior: smooth;
 }
 
-/* Ukrywanie scrollbara dla czystego wyglądu appki */
-.chat-area::-webkit-scrollbar {
-    width: 4px;
-}
-.chat-area::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-}
-
-/* Animacja wejścia dymków */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* DYMKI WIADOMOŚCI ORAZ ANIMACJE */
 .message {
-    max-width: 85%;
+    position: relative;
+    max-width: 80%;
     padding: 12px 16px;
-    border-radius: 20px;
-    font-size: 14.5px;
+    border-radius: 18px;
+    font-size: 14px;
     line-height: 1.4;
-    animation: fadeIn 0.5s ease forwards;
     word-wrap: break-word;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeIn 0.5s ease forwards;
 }
 
-/* Dymek Użytkownika: białe tło, ciemnoniebieskie litery */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dymek Użytkownika: Białe tło, Ciemne litery */
 .user-message {
     background-color: var(--color-user-bg);
     color: var(--color-primary-dark);
     align-self: flex-end;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-/* Dymek Bota: ciemnoniebieskie tło, białe litery */
+/* Dymek Bota: Ciemne tło, Białe litery */
 .bot-message {
     background-color: var(--color-bot-bg);
     color: #ffffff;
     align-self: flex-start;
     border-bottom-left-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
-/* Wskaźnik pisania (Loader) */
-.typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 8px 12px;
+/* SYSTEM TEXT-TO-SPEECH (IKONA GŁOŚNIKA) */
+.speak-msg-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background: #a1a1aa;
-    border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out both;
-}
+.user-message .speak-msg-btn { color: #64748b; }
+.user-message .speak-msg-btn:hover { color: var(--color-primary-blue); background: rgba(2, 132, 199, 0.1); }
+.bot-message .speak-msg-btn { color: #94a3b8; }
+.bot-message .speak-msg-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.15); }
+
+/* WŚKAŹNIK PISANIA BOTA (TRZY KROPKI) */
+.typing-indicator { display: flex; gap: 4px; padding: 12px 16px; width: auto; }
+.typing-indicator span { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
 .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
 .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
 
@@ -264,45 +322,44 @@ body {
 }
 
 /* ==========================================================================
-   6. PANEL WPISYWANIA I FORMULARZ
+   6. PANEL INPUTU (CENTRUM DOLNEJ CZĘŚCI)
    ========================================================================== */
 .input-area {
     padding: 16px 20px;
-    background: rgba(15, 23, 42, 0.4);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .input-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 #cityInput {
     width: 100%;
-    padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 14px;
-    font-size: 15px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    font-size: 14.5px;
     color: var(--color-primary-dark);
     outline: none;
     transition: 0.3s;
 }
-
 #cityInput:focus {
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
 }
 
 #submitBtn {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: var(--color-primary-blue);
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     color: #ffffff;
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -311,24 +368,27 @@ body {
     gap: 8px;
     transition: 0.3s;
 }
-
-#submitBtn:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-#submitBtn:active {
-    transform: translateY(1px);
-}
+#submitBtn:hover { background: #0369a1; }
 
 /* ==========================================================================
-   7. RESPONSYWNOŚĆ (MEDIA QUERIES)
+   7. RESPONSYWNOŚĆ (TRYB PEŁNOEKRANOWEJ APPLIKACJI NA TELEFONIE)
    ========================================================================== */
+.sidebar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(4px);
+    z-index: 15;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
 @media (max-width: 768px) {
-    body {
-        padding: 0;
-        align-items: flex-start;
-    }
+    body { padding: 0; }
 
     .app-container {
         width: 100vw;
@@ -338,12 +398,21 @@ body {
         border-radius: 0;
         border: none;
     }
-    
-    .app-header {
-        padding-top: max(20px, env(safe-area-inset-top)); /* Wsparcie dla notch-a */
+
+    .icon-toggle-btn { display: block; }
+
+    /* Schowanie paska bocznego poza ekran */
+    .app-sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: #f8fafc;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 25px rgba(0,0,0,0.08);
     }
-    
-    .input-area {
-        padding-bottom: max(16px, env(safe-area-inset-bottom));
-    }
+
+    /* Aktywacja interfejsu mobilnego za pomocą klas JS */
+    .app-container.sidebar-open .app-sidebar { transform: translateX(0); }
+    .app-container.sidebar-open .sidebar-overlay { opacity: 1; pointer-events: auto; }
 }

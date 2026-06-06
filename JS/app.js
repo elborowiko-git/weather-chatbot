@@ -1,65 +1,140 @@
+import { fetchCurrentWeather } from './weather.js';
+import { generateRecommendation } from './advisor.js';
+
 // Selektory DOM
 const chatArea = document.getElementById('chatArea');
 const weatherForm = document.getElementById('weatherForm');
 const cityInput = document.getElementById('cityInput');
-const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const historyList = document.getElementById('historyList');
 
-// Klucz bazy LocalStorage
+// Przyciski akcji i kontrolery struktury
+const newChatBtn = document.getElementById('newChatBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const appContainer = document.querySelector('.app-container');
+
 const STORAGE_KEY = 'weather_wear_chat_history';
 
-// Inicjalizacja aplikacji
+// Inicjalizacja aplikacji po załadowaniu drzewa DOM
 document.addEventListener('DOMContentLoaded', () => {
     loadChatHistory();
 });
 
-// Nasłuchiwanie wysłania formularza
-weatherForm.addEventListener('submit', (e) => {
+// ==========================================================================
+// 1. OBSŁUGA FORMULARZA (ZAPYTANIE O POGODĘ)
+// ==========================================================================
+weatherForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const cityName = cityInput.value.trim();
     if (!cityName) return;
 
-    // 1. Dodaj dymek użytkownika
+    // Dodanie dymka użytkownika i zapis do pamięci
     appendMessage(cityName, 'user');
     saveMessageToStorage(cityName, 'user');
     cityInput.value = '';
 
-    // 2. Pokaż animację pisania bota
+    // Pokazanie wskaźnika pisania bota
     const typingIndicator = showTypingIndicator();
 
-    // 3. Symulacja odpowiedzi AI i API (Opóźnienie dla naturalnego efektu)
-    setTimeout(() => {
-        typingIndicator.remove(); // usuń animację kropek
-        
-        const botResponse = generateMockRecommendation(cityName);
+    try {
+        // Pobranie danych pogodowych z API
+        const weatherData = await fetchCurrentWeather(cityName);
+        // Wygenerowanie sugestii ubioru
+        const botResponse = generateRecommendation(weatherData);
+
+        // Renderowanie odpowiedzi bota i zapis
+        typingIndicator.remove();
         appendMessage(botResponse, 'bot');
         saveMessageToStorage(botResponse, 'bot');
-    }, 1200);
-});
+        
+        // Aktualizacja kafelków miast w panelu bocznym
+        renderSidebarHistory();
 
-// Nasłuchiwanie czyszczenia historii
-clearHistoryBtn.addEventListener('click', () => {
-    if (confirm('Czy na pewno chcesz usunąć całą historię rozmów?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        chatArea.innerHTML = '';
-        showWelcomeMessage();
+    } catch (error) {
+        typingIndicator.remove();
+        appendMessage(error.message, 'bot');
+        saveMessageToStorage(error.message, 'bot');
     }
 });
 
+// ==========================================================================
+// 2. OBSŁUGA PRZYCISKÓW AKCJI SYSTEMOWYCH
+// ==========================================================================
+
+// Nowa rozmowa (czyści ekran, zachowuje bazę LocalStorage)
+newChatBtn.addEventListener('click', () => {
+    chatArea.innerHTML = '';
+    showWelcomeMessage();
+    appContainer.classList.remove('sidebar-open'); 
+});
+
+// Wyczyść pamięć (pełny, bezpowrotny reset aplikacji)
+clearHistoryBtn.addEventListener('click', () => {
+    if (confirm('Czy na pewno chcesz bezpowrotnie usunąć całą historię rozmów wraz z pamięcią podręczną?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        chatArea.innerHTML = '';
+        historyList.innerHTML = '';
+        showWelcomeMessage();
+        appContainer.classList.remove('sidebar-open');
+    }
+});
+
+// Zarządzanie wysuwaniem paska bocznego na smartfonach (Hamburger / Overlay)
+toggleSidebarBtn.addEventListener('click', () => appContainer.classList.add('sidebar-open'));
+sidebarOverlay.addEventListener('click', () => appContainer.classList.remove('sidebar-open'));
+
+// ==========================================================================
+// 3. FUNKCJE POMOCNICZE I INTERFEJSY API (SPEECH / LOCAL STORAGE)
+// ==========================================================================
+
 /**
- * Funkcja dodająca dymek wiadomości do okna czatu
+ * Odczytuje podany tekst na głos za pomocą Web Speech API
+ */
+function speakText(text) {
+    // Zatrzymaj poprzednie odtwarzanie, jeśli trwa
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pl-PL';
+    utterance.rate = 1.0;  // Prędkość (0.1 - 2.0)
+    utterance.pitch = 1.0; // Ton głosu (0.0 - 2.0)
+
+    window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Dynamicznie generuje i wstrzykuje dymek wiadomości do okna czatu
  */
 function appendMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', `${sender}-message`);
-    messageDiv.textContent = text;
     
+    // Kontener tekstowy
+    const textSpan = document.createElement('span');
+    textSpan.textContent = text;
+    messageDiv.appendChild(textSpan);
+
+    // Przycisk syntezy mowy (głośnik)
+    const speakBtn = document.createElement('button');
+    speakBtn.classList.add('speak-msg-btn');
+    speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+    speakBtn.title = 'Przeczytaj na głos';
+    
+    speakBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakText(text);
+    });
+
+    messageDiv.appendChild(speakBtn);
     chatArea.appendChild(messageDiv);
-    // Automatyczne przewijanie na dół czatu
+    
+    // Auto-scroll do najnowszej wiadomości
     chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 /**
- * Wyświetlanie animowanych kropek (bota)
+ * Wyświetla trzy pulsujące kropki ładowania odpowiedzi bota
  */
 function showTypingIndicator() {
     const indicatorDiv = document.createElement('div');
@@ -70,48 +145,51 @@ function showTypingIndicator() {
     return indicatorDiv;
 }
 
-/**
- * Obsługa LocalStorage: Zapis
- */
+function showWelcomeMessage() {
+    appendMessage("Cześć! Jestem Twoim inteligentnym doradcą stylizacji. Wpisz nazwę dowolnego miasta, a sprawdzę warunki i dobiorę dla Ciebie idealny ubiór.", 'bot');
+}
+
 function saveMessageToStorage(text, sender) {
     const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     history.push({ text, sender });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 }
 
-/**
- * Obsługa LocalStorage: Odczyt i render
- */
 function loadChatHistory() {
     const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     if (history.length === 0) {
         showWelcomeMessage();
     } else {
-        history.forEach(msg => {
-            appendMessage(msg.text, msg.sender);
-        });
+        history.forEach(msg => appendMessage(msg.text, msg.sender));
     }
+    renderSidebarHistory();
 }
 
 /**
- * Pierwsza wiadomość powitalna
+ * Generuje klikalne kafelki unikalnych miast w pasku bocznym na podstawie LocalStorage
  */
-function showWelcomeMessage() {
-    const welcomeText = "Cześć! Jestem Twoim inteligentnym doradcą stylizacji. Wpisz nazwę dowolnego miasta, a sprawdzę warunki i dobiorę dla Ciebie idealny ubiór.";
-    appendMessage(welcomeText, 'bot');
-}
+function renderSidebarHistory() {
+    historyList.innerHTML = '';
+    const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    
+    // Wyciągamy nazwy wpisywanych miast od użytkownika i usuwamy duplikaty
+    const userCities = history
+        .filter(msg => msg.sender === 'user')
+        .map(msg => msg.text);
+    const uniqueCities = [...new Set(userCities)];
 
-/**
- * Tymczasowy silnik podpowiedzi (Logika regułowa / Mock)
- * W kolejnym kroku zostanie przeniesiony i spięty z OpenWeatherAPI w advisor.js
- */
-function generateMockRecommendation(city) {
-    // Szybka symulacja losowej pogody dla testów UI
-    const options = [
-        `W mieście ${city} jest aktualnie 22°C i świeci słońce. Polecam ubrać lekką, bawełnianą koszulkę, krótkie spodenki oraz okulary przeciwsłoneczne. Dobry dzień na spacer!`,
-        `W lokalizacji ${city} odnotowano opady deszczu i silny wiatr, temperatura to 11°C. Koniecznie załóż kurtkę przeciwdeszczową z kapturem (windstopper), nieprzemakalne buty i weź ze sobą parasol!`,
-        `W mieście ${city} panuje chłodna aura, termometry wskazują zaledwie 3°C. Ubierz się warstwowo ("na cebulkę"): ciepły sweter lub bluza, kurtka przejściowa oraz lekka czapka będą idealnym wyborem.`
-    ];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    return options[randomIndex];
+    uniqueCities.forEach(city => {
+        const btn = document.createElement('button');
+        btn.classList.add('sidebar-btn', 'btn-history-item');
+        btn.innerHTML = `<i class="fa-solid fa-message"></i> <span>${city}</span>`;
+        
+        // Kliknięcie w miasto z historii automatycznie uruchamia dla niego formularz
+        btn.addEventListener('click', () => {
+            cityInput.value = city;
+            weatherForm.dispatchEvent(new Event('submit'));
+            appContainer.classList.remove('sidebar-open'); // Zamknij panel na RWD
+        });
+
+        historyList.appendChild(btn);
+    });
 }

@@ -3,55 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherWear AI - Twój Asystent Ubioru</title>
+    <title>WeatherWear AI - Twój Mobilny Doradca Pogodowy</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <div class="clouds-background">
-        <div class="cloud layer-1"></div>
-        <div class="cloud layer-2"></div>
+        <div class="cloud layer-1 size-sm"></div>
+        <div class="cloud layer-2 size-md"></div>
+        <div class="cloud layer-3 size-lg"></div>
+        <div class="cloud layer-1 size-md delay-1"></div>
+        <div class="cloud layer-2 size-sm delay-2"></div>
     </div>
 
     <main class="app-container">
         
-        <header class="app-header">
-            <div class="bot-profile">
-                <div class="avatar">
-                    <i class="fa-solid fa-cloud-sun-rain"></i>
-                    <span class="status-dot"></span>
-                </div>
-                <div>
-                    <h1>WeatherWear AI</h1>
-                    <p>Doradca stylizacji pogodowej</p>
-                </div>
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <button id="newChatBtn" class="sidebar-btn btn-new-chat">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nowa rozmowa</span>
+                </button>
             </div>
-            <button id="clearHistoryBtn" class="clear-btn" title="Wyczyść historię rozmów">
-                <i class="fa-solid fa-trash-can"></i>
-            </button>
-        </header>
 
-        <section class="chat-area" id="chatArea">
-            </section>
+            <div class="sidebar-history">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Historia rozmów</h3>
+                <div class="history-list" id="historyList"></div>
+            </div>
 
-        <footer class="input-area">
-            <form id="weatherForm" autocomplete="off">
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="cityInput" 
-                        placeholder="Wpisz miasto (np. Toruń, Warszawa)..." 
-                        required
-                    >
-                    <button type="submit" id="submitBtn">
-                        <span>Poproś o sugestię</span>
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </button>
+            <div class="sidebar-footer">
+                <button id="clearHistoryBtn" class="sidebar-btn btn-clear-memory">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Wyczyść pamięć</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="chat-wrapper">
+            
+            <header class="app-header">
+                <button id="toggleSidebarBtn" class="icon-toggle-btn" title="Otwórz historię">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                
+                <div class="bot-profile">
+                    <div class="avatar">
+                        <i class="fa-solid fa-cloud-sun-rain"></i>
+                        <span class="status-dot"></span>
+                    </div>
+                    <div>
+                        <h1>WeatherWear AI</h1>
+                        <p>Doradca stylizacji</p>
+                    </div>
                 </div>
-            </form>
-        </footer>
+            </header>
 
+            <section class="chat-area" id="chatArea">
+                </section>
+
+            <footer class="input-area">
+                <form id="weatherForm" autocomplete="off">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="cityInput" 
+                            placeholder="Wpisz miasto..." 
+                            required
+                        >
+                        <button type="submit" id="submitBtn">
+                            <span>Poproś o sugestię</span>
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                    </div>
+                </form>
+            </footer>
+
+        </div>
     </main>
 
     <script type="module" src="js/app.js"></script>
